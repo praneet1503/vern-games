@@ -1,0 +1,15 @@
+html{
+    margin: 0px;
+    padding: 0px;
+    border: none;
+}
+h1{
+    text-align: center;
+    background-color: brown;
+    border-radius: 10px;
+    margin: 0px;
+    color: #FFF8DC;
+    padding: 0px;
+    border: 0px;
+
+}
