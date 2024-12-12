@@ -57,3 +57,6 @@ h2{
 .exampleClass:hover::before {
     transform: translate(0, -50%);
 }
+hr {
+    display: none;
+}
