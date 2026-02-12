@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Games — Vern Games Player</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">VG</div>
+        <div>
+          <div class="title">Vern Games Player</div>
+          <div class="tagline">Play. Compete. Enjoy.</div>
+        </div>
+      </div>
+      <div>
+        <a href="/" class="btn-secondary">Home</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>Games</h1>
+        <p>Choose a game to play.</p>
+      </section>
+
+      <section class="grid" aria-label="games">
+        <% games.forEach(function(game){ %>
+          <article class="card">
+            <h3><%= game.title %></h3>
+            <p><%= game.description %></p>
+            <div class="card-actions">
+              <a class="play-btn" href="<%= game.path %>">Play</a>
+            </div>
+          </article>
+        <% }) %>
+      </section>
+
+      <footer class="footer">&copy; Vern Games Player</footer>
+    </main>
+  </div>
+</body>
+</html>
