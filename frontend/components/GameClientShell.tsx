@@ -62,6 +62,7 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
   const [statusError, setStatusError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingPlay, setLoadingPlay] = useState(false);
 
   const iframeUrl = useMemo(() => `${apiBaseUrl}/games/${slug}/index.html`, [apiBaseUrl, slug]);
 
@@ -129,11 +130,36 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
       // Keep flow resilient if leaderboard fetch fails.
     }
 
+    // show fullscreen blur + spinner while we transition into play
+    setLoadingPlay(true);
+
     window.localStorage.setItem(USERNAME_STORAGE_KEY, cleaned);
     setUsername(cleaned);
     setStatus("Username saved. Start playing!");
     setStatusError(null);
     setRefreshKey((current) => current + 1);
+
+    // If the iframe is already available, wait for its load event to clear the overlay.
+    // Fallback: remove the overlay after 1.2s if load doesn't fire.
+    const iframe = iframeRef.current;
+    let cleared = false;
+    const clearLoading = () => {
+      if (cleared) return;
+      cleared = true;
+      setLoadingPlay(false);
+    };
+
+    if (iframe) {
+      const onLoad = () => {
+        // small delay so the transition feels natural
+        setTimeout(clearLoading, 300);
+        iframe.removeEventListener("load", onLoad);
+      };
+
+      iframe.addEventListener("load", onLoad);
+    }
+
+    setTimeout(clearLoading, 1200);
   };
 
   useEffect(() => {
@@ -242,6 +268,22 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
     <footer className="game-footer muted">
       Tip: play in fullscreen (use the ⤢ button) for the best experience.
     </footer>
+    {loadingPlay ? (
+      <div className="loading-overlay" role="status" aria-live="polite">
+        <div className="spinner" aria-hidden="true" />
+        <span style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          border: 0,
+        }}>Loading…</span>
+      </div>
+    ) : null}
   </>
   );
 }

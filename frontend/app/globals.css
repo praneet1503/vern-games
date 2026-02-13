@@ -308,3 +308,35 @@ a {
     align-items: start;
   }
 }
+
+/* Loading overlay and spinner */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Subtle tint so blur reads over darker content without a flat grey */
+  background: rgba(2, 6, 23, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 6px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-hidden {
+  display: none !important;
+}
