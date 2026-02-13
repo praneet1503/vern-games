@@ -1,0 +1,92 @@
+# Keep (existing)
+/backend
+/games/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+Thumbs.db
+
+# Node / frontend
+node_modules/
+.next/
+out/
+dist/
+build/
+.cache/
+.vite/
+*.local
+
+# Environment / secrets (don't commit .env or any secret files)
+.env
+.env.*
+.env.local
+secrets.env
+secrets.json
+*.pem
+*.key
+*.crt
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# TypeScript / JS build
+*.tsbuildinfo
+*.map
+
+# Python / backend artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+.venv/
+venv/
+env/
+backend/.venv/
+backend/.env
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
+*.egg-info/
+/dist/
+/build/
+
+# Test reports
+coverage.xml
+junit-*.xml
+
+# Misc
+.DS_Store
+*.swp
+*.pid
+*.seed
+*.pid.lock
+
+# Ignore local IDE/session files
+.vscode/
+.idea/
+
+# Safety: ignore lockfiles only if you explicitly want them untracked (uncomment to use)
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
+
+.next/
+zrandom.txt
