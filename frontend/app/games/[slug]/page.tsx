@@ -10,7 +10,7 @@ type GamePageProps = {
   params: Promise<GamePageParams>;
 };
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL as string;
 
 if (!apiBaseUrl) {
   throw new Error("NEXT_PUBLIC_API_URL is not set.");

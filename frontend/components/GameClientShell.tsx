@@ -190,7 +190,7 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
     };
   }, [apiBaseUrl, slug, username]);
 
-  return (<></>
+  return (<>
     <section className="layout-grid">
       <div className="card">
         <div className="frame-wrap" id={frameWrapId}>
