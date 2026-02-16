@@ -2,6 +2,9 @@ export type GameItem = {
   slug: string;
   title: string;
   description: string;
+  entrypoint?: string | null;
+  status?: string;
+  status_reason?: string;
 };
 
 export type ScoreItem = {
@@ -18,15 +21,41 @@ if (!apiBaseUrl) {
 }
 
 export async function fetchGames(): Promise<GameItem[]> {
-  const response = await fetch(`${apiBaseUrl}/api/games`, {
-    cache: "no-store",
-  });
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/games`, {
+      cache: "no-store",
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch games.");
+    if (!response.ok) {
+      console.error('fetchGames() bad response', response.status);
+      return [];
+    }
+
+    return (await response.json()) as GameItem[];
+  } catch (err) {
+    // Fail gracefully during dev/SSR so the app doesn't crash when backend is down.
+    console.error("fetchGames() error:", err);
+    return [];
   }
+}
 
-  return (await response.json()) as GameItem[];
+export async function fetchGame(slug: string): Promise<GameItem | null> {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/games/${encodeURIComponent(slug)}`, {
+      cache: "no-store",
+    });
+
+    if (response.status === 404) return null;
+    if (!response.ok) {
+      console.error('fetchGame() bad response', response.status);
+      return null;
+    }
+
+    return (await response.json()) as GameItem;
+  } catch (err) {
+    console.error("fetchGame() error:", err);
+    return null;
+  }
 }
 
 export async function fetchLeaderboard(game: string, limit = 10): Promise<ScoreItem[]> {
@@ -56,6 +85,10 @@ export async function submitScore(game: string, username: string, score: number)
   });
 
   if (!response.ok) {
+    if (response.status === 409) {
+      // Username conflict
+      throw new Error("USERNAME_CONFLICT");
+    }
     throw new Error("Failed to submit score.");
   }
 

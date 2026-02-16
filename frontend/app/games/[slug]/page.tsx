@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { GameClientShell } from "@/components/GameClientShell";
+import { fetchGame } from "@/lib/api";
 
 type GamePageParams = {
   slug: string;
@@ -18,6 +20,16 @@ if (!apiBaseUrl) {
 
 export default async function GamePage({ params }: GamePageProps) {
   const { slug } = await params;
+  
+  const game = await fetchGame(slug);
+
+  if (!game) {
+    redirect('/games');
+  }
+  
+  if (game.status === 'in_development') {
+    redirect('/games');
+  }
 
   return (
     <main className="page-shell">
@@ -28,7 +40,7 @@ export default async function GamePage({ params }: GamePageProps) {
       </p>
       <h1 className="page-title">{slug.toUpperCase()}</h1>
 
-      <GameClientShell slug={slug} apiBaseUrl={apiBaseUrl} />
+      <GameClientShell slug={slug} apiBaseUrl={apiBaseUrl} entrypoint={game.entrypoint ?? undefined} />
     </main>
   );
 }

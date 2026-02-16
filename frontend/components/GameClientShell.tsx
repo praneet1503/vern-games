@@ -4,11 +4,13 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import FullscreenButton from "@/components/FullscreenButton";
 import { Leaderboard } from "@/components/Leaderboard";
+import { HealthCheck } from "@/components/HealthCheck";
 import { fetchLeaderboard, submitScore } from "@/lib/api";
 
 type GameClientShellProps = {
   slug: string;
   apiBaseUrl: string;
+  entrypoint?: string;
 };
 
 type ScoreMessage = {
@@ -44,10 +46,10 @@ function isScoreMessage(data: unknown): data is ScoreMessage {
   }
 
   const message = data as ScoreMessage;
-  return message.source === "vern-2048" && message.type === "score-update";
+  return message.type === "score-update";
 }
 
-export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
+export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShellProps) {
   const iframeId = `game-iframe-${slug}`;
   const frameWrapId = `frame-wrap-${slug}`;
 
@@ -60,11 +62,23 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
   const [promptError, setPromptError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [showChangeName, setShowChangeName] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [loadingPlay, setLoadingPlay] = useState(false);
 
-  const iframeUrl = useMemo(() => `${apiBaseUrl}/games/${slug}/index.html`, [apiBaseUrl, slug]);
+  const gamesBaseUrl = useMemo(() => {
+    const configured = process.env.NEXT_PUBLIC_GAMES_BASE_URL;
+    if (configured && configured.trim()) {
+      return configured;
+    }
+    return apiBaseUrl;
+  }, [apiBaseUrl]);
+
+  const iframeUrl = useMemo(() => {
+    const gameEntrypoint = entrypoint && entrypoint.trim() ? entrypoint.trim() : "index.html";
+    return `${gamesBaseUrl}/games/${slug}/${gameEntrypoint}`;
+  }, [entrypoint, gamesBaseUrl, slug]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(USERNAME_STORAGE_KEY);
@@ -135,6 +149,7 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
 
     window.localStorage.setItem(USERNAME_STORAGE_KEY, cleaned);
     setUsername(cleaned);
+    setShowChangeName(false);
     setStatus("Username saved. Start playing!");
     setStatusError(null);
     setRefreshKey((current) => current + 1);
@@ -163,7 +178,7 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
   };
 
   useEffect(() => {
-    const targetOrigin = new URL(apiBaseUrl).origin;
+    const targetOrigin = new URL(iframeUrl).origin;
 
     const onMessage = async (event: MessageEvent<unknown>) => {
       if (event.origin !== targetOrigin) {
@@ -203,8 +218,18 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
         setStatus(`Score submitted: ${event.data.score}`);
         setStatusError(null);
         setRefreshKey((current) => current + 1);
-      } catch {
-        setStatusError("Unable to submit score right now.");
+      } catch (err) {
+        // Handle username conflict from backend
+        if (err instanceof Error && err.message === "USERNAME_CONFLICT") {
+          setStatusError("That username is already taken on this leaderboard. You can pick another name or try an auto-generated one.");
+          // Show name picker overlay and suggest a random available name
+          setShowChangeName(true);
+          try {
+            await handlePickRandom();
+          } catch {}
+        } else {
+          setStatusError("Unable to submit score right now.");
+        }
       } finally {
         setSubmitting(false);
       }
@@ -231,7 +256,7 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
             allow="fullscreen"
           />
 
-          {!username ? (
+          {(!username || showChangeName) ? (
             <div className="username-overlay">
               <h2 className="username-title">Choose your username</h2>
               <p className="muted">This name must be unique for the {slug.toUpperCase()} leaderboard.</p>
@@ -250,6 +275,9 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
                   <button type="submit" className="btn-primary">
                     Save & Play
                   </button>
+                  <button type="button" className="btn-secondary" onClick={() => { setShowChangeName(false); setPromptError(null); }}>
+                    Cancel
+                  </button>
                 </div>
               </form>
               {promptError ? <p className="status-error">{promptError}</p> : null}
@@ -262,11 +290,18 @@ export function GameClientShell({ slug, apiBaseUrl }: GameClientShellProps) {
         {submitting ? <p className="muted">Submitting score...</p> : null}
       </div>
 
-      <Leaderboard game={slug} limit={10} currentUsername={username} refreshKey={refreshKey} />
+      <Leaderboard
+        game={slug}
+        apiBaseUrl={apiBaseUrl}
+        limit={10}
+        currentUsername={username}
+        refreshKey={refreshKey}
+      />
     </section>
 
     <footer className="game-footer muted">
-      Tip: play in fullscreen (use the ⤢ button) for the best experience.
+      <span className="footer-left">Tip: play in fullscreen (use the ⤢ button) for the best experience.</span>
+      <span className="footer-right"><HealthCheck apiBaseUrl={apiBaseUrl} inline /></span>
     </footer>
     {loadingPlay ? (
       <div className="loading-overlay" role="status" aria-live="polite">

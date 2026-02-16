@@ -1,0 +1,34 @@
+Game credits (GitHub-sourced only)
+=================================
+
+This file lists only the game-related projects and libraries included in this repository that originate from GitHub (project, author/maintainers, repo URL, license). For additional attributions/third-party assets, check each game's folder (e.g. `games/2048`, `games/space-shooter`).
+
+- 2048 — Gabriele Cirulli
+  Repo: https://github.com/gabrielecirulli/2048
+  License: MIT
+  Used in: `games/2048` (game source)
+
+- PixiJS — Resourceful 2D WebGL renderer
+  Repo: https://github.com/pixijs/pixi.js
+  License: MIT
+  Used in: `games/space-shooter` (renderer)
+
+- Howler.js — JavaScript audio library
+  Repo: https://github.com/goldfire/howler.js
+  License: MIT
+  Used in: `games/space-shooter` (sound playback)
+
+- tween.js — Tweening/animation library
+  Repo: https://github.com/tweenjs/tween.js
+  License: MIT
+  Used in: `games/space-shooter` (timed tweens)
+
+- randomColor — Color generator utility
+  Repo: https://github.com/davidmerfield/randomColor
+  License: MIT
+  Used in: `games/space-shooter` (color utilities)
+
+---
+Notes:
+- Only projects with GitHub-hosted repositories are included here per your request.
+- All listed projects are open-source; please see each project's repository for full license/attribution details.

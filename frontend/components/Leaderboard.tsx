@@ -6,6 +6,7 @@ import { fetchLeaderboard, type ScoreItem } from "@/lib/api";
 
 type LeaderboardProps = {
   game: string;
+  apiBaseUrl: string;
   limit?: number;
   currentUsername?: string;
   refreshKey?: number;
@@ -15,10 +16,11 @@ function normalizeUsername(value: string) {
   return value.trim().toLowerCase();
 }
 
-export function Leaderboard({ game, limit = 10, currentUsername, refreshKey = 0 }: LeaderboardProps) {
+export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, refreshKey = 0 }: LeaderboardProps) {
   const [items, setItems] = useState<ScoreItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [wsStatus, setWsStatus] = useState<"connecting" | "connected" | "reconnecting" | "offline">("connecting");
 
   useEffect(() => {
     let cancelled = false;
@@ -49,18 +51,30 @@ export function Leaderboard({ game, limit = 10, currentUsername, refreshKey = 0 
     let ws: WebSocket | null = null;
     let shouldReconnect = true;
     let reconnectDelay = 1000; // ms
+    let reconnectTimeoutId: number | null = null;
+    let connectTimeoutId: number | null = null;
 
     const connectWs = () => {
-      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-      const wsUrl = `${protocol}://${window.location.host}/ws/scores?game=${encodeURIComponent(game)}`;
-      ws = new WebSocket(wsUrl);
+      if (!shouldReconnect || ws) {
+        return;
+      }
 
-      ws.onopen = () => {
+      setWsStatus(reconnectDelay > 1000 ? "reconnecting" : "connecting");
+
+      const apiUrl = new URL(apiBaseUrl);
+      const protocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
+      const wsOrigin = `${protocol}//${apiUrl.host}`;
+      const wsUrl = `${wsOrigin}/ws/scores?game=${encodeURIComponent(game)}`;
+      const socket = new WebSocket(wsUrl);
+      ws = socket;
+
+      socket.onopen = () => {
         // reset backoff
         reconnectDelay = 1000;
+        setWsStatus("connected");
       };
 
-      ws.onmessage = (ev) => {
+      socket.onmessage = (ev) => {
         try {
           const msg = JSON.parse(ev.data);
           if (msg.event === "score-created") {
@@ -81,24 +95,30 @@ export function Leaderboard({ game, limit = 10, currentUsername, refreshKey = 0 
         }
       };
 
-      ws.onclose = () => {
-        ws = null;
+      socket.onclose = () => {
+        if (ws === socket) {
+          ws = null;
+        }
         if (shouldReconnect && !document.hidden) {
-          setTimeout(connectWs, reconnectDelay);
+          setWsStatus("reconnecting");
+          reconnectTimeoutId = window.setTimeout(connectWs, reconnectDelay);
           reconnectDelay = Math.min(30000, reconnectDelay * 1.5);
+        } else {
+          setWsStatus("offline");
         }
       };
 
-      ws.onerror = () => {
-        // close socket to trigger reconnect logic in onclose
-        try {
-          ws?.close();
-        } catch {}
+      socket.onerror = () => {
+        // Let onclose handle reconnect; avoid explicit close() to prevent
+        // noisy "closed before connection established" logs during HMR.
+        if (shouldReconnect) {
+          setWsStatus("reconnecting");
+        }
       };
     };
 
     // start websocket
-    connectWs();
+    connectTimeoutId = window.setTimeout(connectWs, 0);
 
     // Poll every 2 minutes, but pause when the tab is hidden to save resources
     const POLL_INTERVAL = 2 * 60 * 1000; // 2 minutes
@@ -114,6 +134,10 @@ export function Leaderboard({ game, limit = 10, currentUsername, refreshKey = 0 
         void load();
         // reconnect immediately if disconnected
         if (!ws) {
+          if (reconnectTimeoutId !== null) {
+            clearTimeout(reconnectTimeoutId);
+            reconnectTimeoutId = null;
+          }
           connectWs();
         }
       }
@@ -124,15 +148,22 @@ export function Leaderboard({ game, limit = 10, currentUsername, refreshKey = 0 
     return () => {
       cancelled = true;
       shouldReconnect = false;
+      setWsStatus("offline");
       if (ws) {
         try {
           ws.close();
         } catch {}
       }
+      if (connectTimeoutId !== null) {
+        clearTimeout(connectTimeoutId);
+      }
+      if (reconnectTimeoutId !== null) {
+        clearTimeout(reconnectTimeoutId);
+      }
       clearInterval(intervalId);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [game, limit, refreshKey]);
+  }, [apiBaseUrl, game, limit, refreshKey]);
 
   return (
     <section className="card">
