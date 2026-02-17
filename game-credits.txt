@@ -33,6 +33,16 @@ This file lists only the game-related projects and libraries included in this re
   License: MIT
   Used in: `games/HTML5-Asteroids` (game source)
 
+- Maze3D — Yannick Comte (Demonixis)
+  Repo: https://github.com/demonixis/Maze3D
+  License: LGPL v2
+  Used in: `games/Maze3D` (game source)
+
+- Three.js — mrdoob
+  Repo: https://github.com/mrdoob/three.js
+  License: MIT
+  Used in: `games/Maze3D` (3D rendering engine)
+
 ---
 Notes:
 - Only projects with GitHub-hosted repositories are included here per your request.

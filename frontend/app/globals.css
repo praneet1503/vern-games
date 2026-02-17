@@ -139,8 +139,16 @@ a {
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1rem;
+}
+
+/* Responsive: 2 cols on medium, 3 cols on wide screens */
+@media (min-width: 680px) {
+  .games-grid { grid-template-columns: repeat(2, minmax(250px, 1fr)); }
+}
+@media (min-width: 980px) {
+  .games-grid { grid-template-columns: repeat(3, minmax(240px, 1fr)); }
 }
 
 .game-title {
