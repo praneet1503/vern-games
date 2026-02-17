@@ -28,6 +28,11 @@ This file lists only the game-related projects and libraries included in this re
   License: MIT
   Used in: `games/space-shooter` (color utilities)
 
+- HTML5-Asteroids — Doug McInnes
+  Repo: https://github.com/dmcinnes/HTML5-Asteroids
+  License: MIT
+  Used in: `games/HTML5-Asteroids` (game source)
+
 ---
 Notes:
 - Only projects with GitHub-hosted repositories are included here per your request.

@@ -90,3 +90,5 @@ junit-*.xml
 
 .next/
 zrandom.txt
+.github/copilot-instructions.md
+.github/text-gen.yml
