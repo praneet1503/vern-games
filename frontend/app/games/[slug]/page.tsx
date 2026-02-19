@@ -40,7 +40,12 @@ export default async function GamePage({ params }: GamePageProps) {
       </p>
       <h1 className="page-title">{slug.toUpperCase()}</h1>
 
-      <GameClientShell slug={slug} apiBaseUrl={apiBaseUrl} entrypoint={game.entrypoint ?? undefined} />
+      <GameClientShell
+        slug={slug}
+        apiBaseUrl={apiBaseUrl}
+        entrypoint={game.entrypoint ?? undefined}
+        leaderboardEnabled={game.leaderboard_enabled ?? true}
+      />
     </main>
   );
 }

@@ -11,6 +11,7 @@ type GameClientShellProps = {
   slug: string;
   apiBaseUrl: string;
   entrypoint?: string;
+  leaderboardEnabled?: boolean;
 };
 
 type ScoreMessage = {
@@ -49,7 +50,7 @@ function isScoreMessage(data: unknown): data is ScoreMessage {
   return message.type === "score-update";
 }
 
-export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShellProps) {
+export function GameClientShell({ slug, apiBaseUrl, entrypoint, leaderboardEnabled = true }: GameClientShellProps) {
   const iframeId = `game-iframe-${slug}`;
   const frameWrapId = `frame-wrap-${slug}`;
 
@@ -89,10 +90,17 @@ export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShel
       return;
     }
 
+    // For fun-only games, auto-set a placeholder username so the game is
+    // immediately playable without the username overlay.
+    if (!leaderboardEnabled) {
+      setUsername("player");
+      return;
+    }
+
     const fallback = randomCandidate();
     setCandidate(fallback);
     setUsernameInput(fallback);
-  }, []);
+  }, [leaderboardEnabled]);
 
   const handlePickRandom = async () => {
     setPromptError(null);
@@ -178,6 +186,9 @@ export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShel
   };
 
   useEffect(() => {
+    // No score submission for fun-only games.
+    if (!leaderboardEnabled) return;
+
     const targetOrigin = new URL(iframeUrl).origin;
 
     const onMessage = async (event: MessageEvent<unknown>) => {
@@ -239,7 +250,7 @@ export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShel
     return () => {
       window.removeEventListener("message", onMessage);
     };
-  }, [apiBaseUrl, slug, username]);
+  }, [apiBaseUrl, slug, username, leaderboardEnabled]);
 
   return (<>
     <section className="layout-grid">
@@ -256,7 +267,7 @@ export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShel
             allow="fullscreen"
           />
 
-          {(!username || showChangeName) ? (
+          {(!username || showChangeName) && leaderboardEnabled ? (
             <div className="username-overlay">
               <h2 className="username-title">Choose your username</h2>
               <p className="muted">This name must be unique for the {slug.toUpperCase()} leaderboard.</p>
@@ -285,18 +296,20 @@ export function GameClientShell({ slug, apiBaseUrl, entrypoint }: GameClientShel
           ) : null}
         </div>
 
-        {status ? <p className="status-note">{status}</p> : null}
-        {statusError ? <p className="status-error">{statusError}</p> : null}
-        {submitting ? <p className="muted">Submitting score...</p> : null}
+        {status && leaderboardEnabled ? <p className="status-note">{status}</p> : null}
+        {statusError && leaderboardEnabled ? <p className="status-error">{statusError}</p> : null}
+        {submitting && leaderboardEnabled ? <p className="muted">Submitting score...</p> : null}
       </div>
 
-      <Leaderboard
-        game={slug}
-        apiBaseUrl={apiBaseUrl}
-        limit={10}
-        currentUsername={username}
-        refreshKey={refreshKey}
-      />
+      {leaderboardEnabled ? (
+        <Leaderboard
+          game={slug}
+          apiBaseUrl={apiBaseUrl}
+          limit={10}
+          currentUsername={username}
+          refreshKey={refreshKey}
+        />
+      ) : null}
     </section>
 
     <footer className="game-footer muted">

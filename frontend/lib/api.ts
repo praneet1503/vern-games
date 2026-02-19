@@ -5,6 +5,7 @@ export type GameItem = {
   entrypoint?: string | null;
   status?: string;
   status_reason?: string;
+  leaderboard_enabled?: boolean;
 };
 
 export type ScoreItem = {

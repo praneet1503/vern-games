@@ -23,3 +23,12 @@ Vern Games Player is licensed under the MIT License. See the LICENSE file for mo
 
 #Contact
 For any questions or support, please contact us at
+
+#Status
+in development. Stay tuned for updates and new features!
+
+#legal Disclaimer: Vern Games Player is a platform for hosting and playing games. We do not own the rights to the games available on the platform. All games are provided by third-party developers, and we are not responsible for any content or issues that may arise from playing 
+these games. Please try not to sue us. :) please look at the Legal.md file for more information.
+
+#Note 
+The files in this repository are intentionally not given due to security reasons. We will be open sourcing the entire codebase in future. after launching :)
