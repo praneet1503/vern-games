@@ -15,7 +15,6 @@ export default function GamesFilter({ initialGames }: { initialGames?: GameItem[
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Apply the appropriate filter to server-provided `initialGames` on hydration
     if (initialGames) {
       const filtered = tab === "in_dev"
         ? initialGames.filter((g) => g.status === "in_development")
@@ -42,11 +41,10 @@ export default function GamesFilter({ initialGames }: { initialGames?: GameItem[
     }
   }
 
-  // initial client-side load: ensure default tab shows up-to-date list
   useEffect(() => {
-    // If there are no initial games (edge-case), fetch on mount
+
     if (!initialGames || initialGames.length === 0) loadAndFilter(tab);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); 
 
   return (
     <>
@@ -87,7 +85,7 @@ export default function GamesFilter({ initialGames }: { initialGames?: GameItem[
                   borderRadius: '4px',
                   fontSize: '12px',
                   fontWeight: 600,
-                }}>IN DEV</span>
+                }}>in dev</span>
               )}
             </div>
             <p className="game-description">{game.description}</p>

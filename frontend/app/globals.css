@@ -489,7 +489,7 @@ a {
   display: flex;
   gap: 1rem;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: 100%;
   max-width: min(1100px, 100% - 2rem);
   margin: 0 auto;

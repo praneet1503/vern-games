@@ -1,7 +1,7 @@
-Game credits (GitHub-sourced only)
-=================================
+Game credits (open-source projects only)
 
-This file lists only the game-related projects and libraries included in this repository that originate from GitHub (project, author/maintainers, repo URL, license). For additional attributions/third-party assets, check each game's folder (e.g. `games/2048`, `games/space-shooter`).
+the games are taken from open-source projects
+i simply rengineered them to run on the web and added some features here and there
 
 - 2048 — Gabriele Cirulli
   Repo: https://github.com/gabrielecirulli/2048
@@ -56,5 +56,4 @@ This file lists only the game-related projects and libraries included in this re
 
 ---
 Notes:
-- Only projects with GitHub-hosted repositories are included here per your request.
 - All listed projects are open-source; please see each project's repository for full license/attribution details.
