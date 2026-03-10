@@ -1,9 +1,6 @@
 "use client";
-
 import { useEffect, useState } from "react";
-
 import { fetchLeaderboard, type ScoreItem } from "@/lib/api";
-
 type LeaderboardProps = {
   game: string;
   apiBaseUrl: string;
@@ -11,11 +8,9 @@ type LeaderboardProps = {
   currentUsername?: string;
   refreshKey?: number;
 };
-
 function normalizeUsername(value: string) {
   return value.trim().toLowerCase();
 }
-
 export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, refreshKey = 0 }: LeaderboardProps) {
   const [items, setItems] = useState<ScoreItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -44,10 +39,8 @@ export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, ref
       }
     };
 
-    // initial load
     load();
 
-    // WebSocket: subscribe to live updates
     let ws: WebSocket | null = null;
     let shouldReconnect = true;
     let reconnectDelay = 1000; // ms
@@ -69,7 +62,6 @@ export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, ref
       ws = socket;
 
       socket.onopen = () => {
-        // reset backoff
         reconnectDelay = 1000;
         setWsStatus("connected");
       };
@@ -81,7 +73,6 @@ export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, ref
             const newItem = msg.data as ScoreItem;
 
             setItems((prev) => {
-              // Insert/merge new score and keep list sorted desc by score
               const seenKey = `${newItem.username}-${newItem.timestamp}`;
               const exists = prev.some((p) => `${p.username}-${p.timestamp}` === seenKey);
               if (exists) return prev;
@@ -91,7 +82,6 @@ export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, ref
             });
           }
         } catch (err) {
-          // ignore malformed messages
         }
       };
 
@@ -109,30 +99,24 @@ export function Leaderboard({ game, apiBaseUrl, limit = 10, currentUsername, ref
       };
 
       socket.onerror = () => {
-        // Let onclose handle reconnect; avoid explicit close() to prevent
-        // noisy "closed before connection established" logs during HMR.
         if (shouldReconnect) {
           setWsStatus("reconnecting");
         }
       };
     };
 
-    // start websocket
     connectTimeoutId = window.setTimeout(connectWs, 0);
 
-    // Poll every 2 minutes, but pause when the tab is hidden to save resources
-    const POLL_INTERVAL = 2 * 60 * 1000; // 2 minutes
+    const POLL_INTERVAL = 2 * 60 * 1000; 
     const intervalId = window.setInterval(() => {
       if (!document.hidden) {
         void load();
       }
     }, POLL_INTERVAL);
 
-    // If the tab becomes visible again, fetch immediately so the user sees fresh data
     const onVisibilityChange = () => {
       if (!document.hidden) {
         void load();
-        // reconnect immediately if disconnected
         if (!ws) {
           if (reconnectTimeoutId !== null) {
             clearTimeout(reconnectTimeoutId);

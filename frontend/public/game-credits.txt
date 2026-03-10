@@ -33,6 +33,12 @@ This file lists only the game-related projects and libraries included in this re
   License: MIT
   Used in: `games/HTML5-Asteroids` (game source)
 
+- JavaScript Racer — Jake Gordon
+  Repo: https://github.com/jakesgordon/javascript-racer
+  License: MIT
+  Used in: `games/javascript-racer` (game source)
+  Note: bundled music has upstream project-only usage restrictions (see `games/javascript-racer/README.md`).
+
 - Maze3D — Yannick Comte (Demonixis)
   Repo: https://github.com/demonixis/Maze3D
   License: LGPL v2

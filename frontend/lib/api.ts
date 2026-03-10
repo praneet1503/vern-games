@@ -34,7 +34,6 @@ export async function fetchGames(): Promise<GameItem[]> {
 
     return (await response.json()) as GameItem[];
   } catch (err) {
-    // Fail gracefully during dev/SSR so the app doesn't crash when backend is down.
     console.error("fetchGames() error:", err);
     return [];
   }

@@ -12,6 +12,7 @@ type GameClientShellProps = {
   apiBaseUrl: string;
   entrypoint?: string;
   leaderboardEnabled?: boolean;
+  gameTitle?: string;
 };
 
 type ScoreMessage = {
@@ -50,7 +51,12 @@ function isScoreMessage(data: unknown): data is ScoreMessage {
   return message.type === "score-update";
 }
 
-export function GameClientShell({ slug, apiBaseUrl, entrypoint, leaderboardEnabled = true }: GameClientShellProps) {
+function humanizeSlug(s: string) {
+  return s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function GameClientShell({ slug, apiBaseUrl, entrypoint, leaderboardEnabled = true, gameTitle }: GameClientShellProps) {
+  const displayTitle = gameTitle ?? humanizeSlug(slug);
   const iframeId = `game-iframe-${slug}`;
   const frameWrapId = `frame-wrap-${slug}`;
 
@@ -263,14 +269,14 @@ export function GameClientShell({ slug, apiBaseUrl, entrypoint, leaderboardEnabl
             id={iframeId}
             src={iframeUrl}
             className={`game-frame${username ? "" : " game-frame-blocked"}`}
-            title={`${slug} game`}
+            title={`${displayTitle} game`}
             allow="fullscreen"
           />
 
           {(!username || showChangeName) && leaderboardEnabled ? (
             <div className="username-overlay">
               <h2 className="username-title">Choose your username</h2>
-              <p className="muted">This name must be unique for the {slug.toUpperCase()} leaderboard.</p>
+              <p className="muted">This name must be unique for the {displayTitle} leaderboard.</p>
               <form className="username-form" onSubmit={handleConfirmUsername}>
                 <input
                   value={usernameInput}
