@@ -1,5 +1,5 @@
 # Vern Games Player
-=================
+
 Vern Games Player is a web-based application that allows users to play a collection of classic and modern games directly in their web browser. The player provides an intuitive interface for browsing and launching games, as well as features for saving progress and customizing settings.
 
 # Features
@@ -43,7 +43,7 @@ Vern Games Player is licensed under the MIT License. See the LICENSE file for mo
 For any questions or support, please contact us at
 
 # Status
-in development. Stay tuned for updates and new features!
+It is complete 
 
 # legal Disclaimer:
  Vern Games Player is a platform for hosting and playing games. We do not own the rights to the games available on the platform. All games are provided by third-party developers, and we are not responsible for any content or issues that may arise from playing 
