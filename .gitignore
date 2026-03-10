@@ -1,6 +1,6 @@
 # Keep (existing)
-/backend
-/games/
+# track `backend/` and `games/` (keep source public). Exclude large binaries below.
+
 
 # macOS
 .DS_Store
@@ -90,5 +90,17 @@ junit-*.xml
 
 .next/
 zrandom.txt
-.github/copilot-instructions.md
+# Ignore Freedoom binary assets (proprietary game data)
+games/freedoom/*.wad
+games/freedoom/*.wasm
 .github/text-gen.yml
+.github
+
+/games/2048
+/games/HTML5-Asteroids
+/games/freedoom
+/games/javascript-racer
+/games/the-house-game
+/games/space-shooter
+/games/Maze3D
+/backend/tests

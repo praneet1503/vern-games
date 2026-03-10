@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+websockets
+python-multipart
+sqlalchemy
+psycopg[binary]
+redis[asyncio]>=4.6.0
